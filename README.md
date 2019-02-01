@@ -75,7 +75,7 @@ sudo apt-get install git
 # Download Required Setup files
 
 ```bash
-git clone .... # TODO
+git clone https://github.com/David-Development/cluster-setup.git
 ```
 
 # Setup Swarm Cluster
