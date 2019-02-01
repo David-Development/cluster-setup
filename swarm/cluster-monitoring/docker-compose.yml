@@ -1,0 +1,63 @@
+version: '3'
+
+services:
+  telegraf:
+    image: luhmer/cluster-monitor-telegraf:0.1
+    build:
+      context: docker/telegraf
+      dockerfile: Dockerfile
+    environment:
+      - HOST_PROC=/host/proc
+    hostname: "{{.Node.Hostname}}"
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      - /proc:/host/proc:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      # A global service is a service that runs one task on every node.
+      mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  influxdb:
+    image: influxdb:1.6.3
+    ports:
+      - "8086:8086"
+      - "25826:25826/udp"
+    volumes:
+      - ./influxdb-data:/var/lib/influxdb
+    environment:
+      - INFLUXDB_DB=events
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
+
+  grafana:
+    image: grafana/grafana:5.3.0-beta3
+    user: "root"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana-storage:/var/lib/grafana
+      - ./docker/grafana/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+      - ./docker/grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml
+      #- ./docker/grafana/Dashboard.json:/var/lib/grafana/dashboards/Dashboard.json
+      - ./docker/grafana/Dashboard_Telegraf.json:/var/lib/grafana/dashboards/Dashboard.json
+      - /etc/timezone:/etc/timezone:ro
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager

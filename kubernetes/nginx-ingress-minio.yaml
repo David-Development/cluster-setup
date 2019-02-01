@@ -1,0 +1,27 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-rke
+  #annotations:
+  #  kubernetes.io/ingress.class: "nginx"
+  #  nginx.org/listen-ports: "80"
+  #  nginx.org/proxy-connect-timeout: "30s"
+  #  nginx.org/proxy-read-timeout: "20s"
+  #  nginx.org/client-max-body-size: "4m"
+spec:
+  backend:
+    serviceName: kubernetes-dashboard
+    servicePort: 80
+  rules:
+    - http:
+        paths:
+        - path: /workflows/*
+          backend:
+            serviceName: argo-ui
+            servicePort: 80
+    - http:
+        paths:
+        - path: /minio/*
+          backend:
+            serviceName: minio-service
+            servicePort: 9001
