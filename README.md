@@ -146,6 +146,12 @@ bash startCluster.sh ${CLUSTER_NAME}
 bash addNodesToCluster.sh ${CLUSTER_NAME} nm-smt02 nm-smt03
 ```
 
+- The Rancher UI will be available under: https://nm-smt01:8443 (login admin/admin)
+- The Kubernetes Dashboard will be available under: https://nm-smt01:8444 (login using token - see below)
+- In the directory `lm-cluster-setup/kubernetes` there will be multiple, generated files such as: `kube-dashboard-token.txt`, `kube-dashboard-url.txt` and `rancher-login-token.txt`. 
+- In order to connect your rancher cli from a remote host to your rancher setup, run the following command: `rancher login https://nm-smt01:8443 --token XXX` (use the token from the file `rancher-login-token.txt`)
+  - After that you'll be able to run rancher and kubectl commands such as `rancher <command>` and `rancher kubectl <command>`
+
 
 ## Configure Docker Registry (Optional)
 
