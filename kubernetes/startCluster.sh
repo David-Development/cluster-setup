@@ -169,7 +169,7 @@ xdg-open "http://${HOST_IP}:8080"
 
 
 echo -e "Done!\n\nAdd master node to it.. (etcd / management / worker)"
-ADD_NODE_COMMAND=$(rancher clusters add-node --etcd --management --worker ${CLUSTER_NAME})
+ADD_NODE_COMMAND=$(rancher clusters add-node --etcd --controlplane --worker ${CLUSTER_NAME})
 ADD_NODE_DOCKER_COMMAND=$(echo "$ADD_NODE_COMMAND" | grep -o "docker.*")
 $ADD_NODE_DOCKER_COMMAND
 echo -e "Done!\n\n"
