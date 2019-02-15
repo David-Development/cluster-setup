@@ -5,21 +5,15 @@ if test "$BASH" != "/bin/bash"; then
     exit
 fi
 
-#WORKER_NODES=( "" "nm-tantalos" )
+# export path variable to include "tools" (kubectl / rancher / ...)
+TOOLS_FOLDER="$(pwd)/tools/"
+PATH="$PATH:${TOOLS_FOLDER}"
+
+RKE_NODES=($(rancher nodes ls --format '{{.Node.ID}}'))
+WORKER_NODES=($(rancher nodes ls --format '{{.Node.Hostname}}'))
+CLUSTERS_TO_DELETE=($(rancher clusters ls --format '{{.Cluster.ID}}'))
+
 #WORKER_NODES=( "" "nm-smt02" "nm-smt03" )
-
-if [[ -z "$@" ]]; then
-  echo -e "Error: Invalid argument. At least one hostname needs to be specified.\n\nbash stopCluster.sh <node-name>"
-  exit 1;
-fi;
-
-WORKER_NODES=( "" "$@" )
-
-#for WORKER_NODE in "${WORKER_NODES[@]}"; do
-#  echo "Worker-Node: $WORKER_NODE"
-#done
-
-
 
 FILES_TO_DELETE="/etc/ceph/* \
       /etc/cni/* \
@@ -60,11 +54,10 @@ DELETE_COMMAND="docker run \
 ubuntu:16.04 /bin/bash -c \"rm -rf ${FILES_TO_DELETE}\""
 # ubuntu:16.04 /bin/bash -c \"ls -la /var/lib/\""
 
-
 #echo "${DELETE_COMMAND}"
-#exit
 
 cat ../signatures/signature-kubernetes.txt
+
 
 ###############################################################################
 # ask user if everything is correct
@@ -77,6 +70,8 @@ while true; do
     echo "${bold_font}Configuration:${normal_font}"
     echo "Folders to delete: ${bold_font} ${FILES_TO_DELETE} ${normal_font}"
     echo "Worker Nodes:      ${bold_font} ${WORKER_NODES[@]} ${normal_font}"
+    echo "RKE Nodes:         ${bold_font} ${RKE_NODES[@]} ${normal_font}"
+    echo "Clusters to Delete:${bold_font} ${CLUSTERS_TO_DELETE[@]} ${normal_font}"
     echo " "
     read -p "Is this configuration correct? (y/n): " yn
     case $yn in
@@ -86,16 +81,7 @@ while true; do
     esac
 done
 
-# export path variable to include "tools" (kubectl / rancher / ...)
-TOOLS_FOLDER="$(pwd)/tools/"
-PATH="$PATH:${TOOLS_FOLDER}"
 
-
-# Remove Minio
-#helm del --purge argo-artifacts
-
-# Uninstall Argo
-#argo uninstall
 
 # Delete Persistent Volumes / -Claims for pachyderm
 rancher kubectl delete pvc etcd-storage
@@ -132,6 +118,34 @@ rancher kubectl delete namespaces reana
 # Delete Secrets (you won't be able to login after!)
 rancher kubectl delete secrets reana-ssl-secrets
 rancher kubectl delete secrets --all
+
+echo "Deleting everything in Kubernetes cluster"
+for each in $(kubectl get ns -o jsonpath="{.items[*].metadata.name}" | grep -v kube-system); do
+  rancher kubectl delete ns $each
+done
+
+
+echo "Waiting for a bit.."
+sleep 10
+
+for CLUSTER_TO_DELETE in "${CLUSTERS_TO_DELETE[@]}"; do
+    CMD="rancher clusters delete ${CLUSTER_TO_DELETE}"
+    echo "rancher clusters delete ${CLUSTER_TO_DELETE}"
+    $CMD
+done
+
+echo "Waiting for clusters to be deleted.."
+sleep 30
+
+for RKE_NODE in "${RKE_NODES[@]}"; do
+    CMD="rancher nodes delete ${RKE_NODE}"
+    echo "rancher nodes delete ${RKE_NODE}"
+    $CMD
+done
+
+echo "Waiting for nodes to be deleted.."
+sleep 60
+
 
 
 delete_docker_on_host () {
@@ -200,8 +214,7 @@ delete_docker_on_host () {
     echo "###################"
 }
 
-for WORKER_NODE in "${WORKER_NODES[@]}"
-do
+for WORKER_NODE in "${WORKER_NODES[@]}"; do
     delete_docker_on_host ${WORKER_NODE}
 done
 

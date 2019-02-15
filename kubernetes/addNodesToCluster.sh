@@ -68,6 +68,7 @@ do
     echo -e "Done!\n\nAdd worker node ${WORKER_NODE} to it.."
     ADD_NODE_COMMAND=$(${RANCHER_CLI} clusters add-node --worker ${CLUSTER_NAME})
     ADD_NODE_DOCKER_COMMAND=$(echo "$ADD_NODE_COMMAND" | grep -o "docker.*")
+    echo "Running command: ${WORKER_NODE} $ADD_NODE_DOCKER_COMMAND"
     ssh ${WORKER_NODE} $ADD_NODE_DOCKER_COMMAND
 done
 echo -e "Done!\n\n"
