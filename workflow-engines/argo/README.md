@@ -17,5 +17,3 @@ bash startArgo.sh
 
 bash run_training_kubernetes_argo.sh
 ```
-
-# Reset minio storage
