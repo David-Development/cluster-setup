@@ -16,6 +16,7 @@ Docs: https://pachyderm.readthedocs.io/en/stable/deployment/on_premises.html
 
 # Run example
 
+```bash
 cd examples/word_count/
 ../../tools/pachctl delete-repo urls
 ../../tools/pachctl create-repo urls
@@ -23,7 +24,7 @@ cd examples/word_count/
 ../../tools/pachctl create-pipeline -f scraper.json
 ../../tools/pachctl create-pipeline -f map.json
 ../../tools/pachctl create-pipeline -f reduce.json
-
+```
 
 # Useful Commands
 
