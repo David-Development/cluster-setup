@@ -1,6 +1,7 @@
 # DigDag
 
-curl -o digdag -L "https://dl.digdag.io/digdag-latest"
+Download Digdag binary
+`curl -o digdag -L "https://dl.digdag.io/digdag-latest"`
 
 ## Deploy locally
 
