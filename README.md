@@ -109,22 +109,6 @@ docker stack deploy --with-registry-auth --compose-file docker-compose.yml clust
 - Then you can open grafana using http://node1:3000 (login with admin/admin)
 
 
-## Setup distributed minio storage
-
-- In order to setup a distributed mino storage, you'll need to have at least 4 nodes available (the number of nodes has to be even).
-- This script will label all of your nodes in your swarm from 0-N (e.g. "minio0=true").
-- Make sure to adapt the `docker-compose-minio.yaml` before running this script to match your cluster.
-  - Configure the `placement: -> constraints: -> node.labels.minio0==true` accordingly for each node
-  - Note: It's configured to run 4 minio instances on three nodes. We only had 3 nodes in our cluster - Node 0 is running two instances (minio0 and minio3).
-
-
-```bash
-cd cluster-setup/swarm/
-bash startDistributedMinioCluster.sh
-```
-
-- Access minio using: http://node1:9001 (login using minio/minio123)
-
 
 
 # Setup Kubernetes

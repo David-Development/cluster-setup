@@ -5,10 +5,10 @@ if test "$BASH" != "/bin/bash"; then
     exit
 fi
 
-if [[ -z "$@" ]]; then
-  echo -e "Error: Invalid argument. At least one hostname needs to be specified.\n\nbash addNodesToCluster.sh <node-name>"
-  exit 1;
-fi;
+#if [[ -z "$@" ]]; then
+#  echo -e "Error: Invalid argument. At least one hostname needs to be specified.\n\nbash startSwarmCluster.sh <node-name>"
+#  exit 1;
+#fi;
 
 WORKER_NODES=( "$@" )
 
