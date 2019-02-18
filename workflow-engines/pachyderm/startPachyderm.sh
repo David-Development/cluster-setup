@@ -11,12 +11,12 @@ fi
 
 ################################################################
 
-S3_STORAGE_HOST=<host-name>:9001
+S3_STORAGE_HOST="ip/hostname:9001"
 S3_STORAGE_USERNAME=minio
 S3_STORAGE_PASSWORD=minio123
-S3_STORAGE_BUCKET=audio-mining
+S3_STORAGE_BUCKET=pachyderm
 
-ETCD_STORAGE="/home/dluhmer/development/persistent-storage/pachyderm-etcd"
+ETCD_STORAGE="/home/david/persistent-storage/pachyderm-etcd"
 NUM_ETCD_NODES=1
 
 PROJECT_NAME="pachyderm"
@@ -26,12 +26,14 @@ CLUSTER_NAME="test-cluster"
 
 # enable custom registry
 DOCKER_REGISTRY_ENABLED=false
-DOCKER_REGISTRY_SERVER=<hostname>
-DOCKER_REGISTRY_USERNAME=<username>
-DOCKER_REGISTRY_PASSWORD=<password>
-DOCKER_REGISTRY_EMAIL=<email>
+DOCKER_REGISTRY_SERVER="hostname"
+DOCKER_REGISTRY_USERNAME="username"
+DOCKER_REGISTRY_PASSWORD="password"
+DOCKER_REGISTRY_EMAIL="email"
 
-PACHD_HOST=<hostname>
+# Size of pachd's in-memory cache for PFS files. Size is specified in bytes, with allowed SI suffixes (M, K, G, Mi, Ki, Gi, etc).
+PACH_BLOCK_CACHE_SIZE=1Gi 
+PACHD_HOST="ip/hostname"
 
 RANCHER_CLI_VERSION=v2.0.6
 
@@ -52,17 +54,21 @@ normal_font=$(tput sgr0)
 
 while true; do
     echo "${bold_font}Configuration:${normal_font}"
-    echo "ETCD_STORAGE:        ${bold_font} ${ETCD_STORAGE} ${normal_font}"
-    echo "NUM_ETCD_NODES:      ${bold_font} ${NUM_ETCD_NODES} ${normal_font}"
-    echo "S3_STORAGE_HOST:     ${bold_font} ${S3_STORAGE_HOST} ${normal_font}"
-    echo "S3_STORAGE_USERNAME: ${bold_font} ${S3_STORAGE_USERNAME} ${normal_font}"
-    echo "S3_STORAGE_PASSWORD: ${bold_font} ${S3_STORAGE_PASSWORD} ${normal_font}"
-    echo "S3_STORAGE_BUCKET:  ${bold_font} ${S3_STORAGE_BUCKET} ${normal_font}"
-    echo "DOCKER_REGISTRY_ENABLED: ${bold_font} ${DOCKER_REGISTRY_ENABLED} ${normal_font}"
-    echo "DOCKER_REGISTRY_SERVER:  ${bold_font} ${DOCKER_REGISTRY_SERVER} ${normal_font}"
-    echo "DOCKER_REGISTRY_USERNAME:${bold_font} ${DOCKER_REGISTRY_USERNAME} ${normal_font}"
-    echo "DOCKER_REGISTRY_PASSWORD:${bold_font} ${DOCKER_REGISTRY_PASSWORD} ${normal_font}"
-    echo "DOCKER_REGISTRY_EMAIL:   ${bold_font} ${DOCKER_REGISTRY_EMAIL} ${normal_font}"
+    echo "ETCD_STORAGE:            ${bold_font} ${ETCD_STORAGE} ${normal_font}"
+    echo "NUM_ETCD_NODES:          ${bold_font} ${NUM_ETCD_NODES} ${normal_font}"
+    echo "S3_STORAGE_HOST:         ${bold_font} ${S3_STORAGE_HOST} ${normal_font}"
+    echo "S3_STORAGE_USERNAME:     ${bold_font} ${S3_STORAGE_USERNAME} ${normal_font}"
+    echo "S3_STORAGE_PASSWORD:     ${bold_font} ${S3_STORAGE_PASSWORD} ${normal_font}"
+    echo "S3_STORAGE_BUCKET:       ${bold_font} ${S3_STORAGE_BUCKET} ${normal_font}"
+    if [ "$DOCKER_REGISTRY_ENABLED" = true ] ; then
+      echo "DOCKER_REGISTRY_ENABLED: ${bold_font} ${DOCKER_REGISTRY_ENABLED} ${normal_font}"
+      echo "DOCKER_REGISTRY_SERVER:  ${bold_font} ${DOCKER_REGISTRY_SERVER} ${normal_font}"
+      echo "DOCKER_REGISTRY_USERNAME:${bold_font} ${DOCKER_REGISTRY_USERNAME} ${normal_font}"
+      echo "DOCKER_REGISTRY_PASSWORD:${bold_font} ${DOCKER_REGISTRY_PASSWORD} ${normal_font}"
+      echo "DOCKER_REGISTRY_EMAIL:   ${bold_font} ${DOCKER_REGISTRY_EMAIL} ${normal_font}"
+    fi
+
+    echo "PACH_BLOCK_CACHE_SIZE:   ${bold_font} ${PACH_BLOCK_CACHE_SIZE} ${normal_font}"
     echo "PACHD_HOST:              ${bold_font} ${PACHD_HOST} ${normal_font}"
     echo "Tools Folder:            ${bold_font} ${TOOLS_FOLDER} ${normal_font}"
     echo " "
@@ -153,7 +159,7 @@ fi
 
 echo "Deploying S3 connection"
 # pachctl deploy custom --persistent-disk google --object-store s3 <persistent disk name> <persistent disk size> <object store bucket> <object store id> <object store secret> <object store endpoint> --static-etcd-volume=${STORAGE_NAME} --dry-run > deployment.json
-pachctl deploy custom --namespace ${NAMESPACE} --dynamic-etcd-nodes $NUM_ETCD_NODES --block-cache-size 50G --persistent-disk google --object-store s3 pachyderm-s3 10 ${S3_STORAGE_BUCKET} ${S3_STORAGE_USERNAME} ${S3_STORAGE_PASSWORD} ${S3_STORAGE_HOST} --dry-run > deployment.json
+pachctl deploy custom --namespace ${NAMESPACE} --dynamic-etcd-nodes $NUM_ETCD_NODES --block-cache-size ${PACH_BLOCK_CACHE_SIZE} --persistent-disk google --object-store s3 pachyderm-s3 10 ${S3_STORAGE_BUCKET} ${S3_STORAGE_USERNAME} ${S3_STORAGE_PASSWORD} ${S3_STORAGE_HOST} --dry-run > deployment.json
 echo -e "Done..\n"
 
 

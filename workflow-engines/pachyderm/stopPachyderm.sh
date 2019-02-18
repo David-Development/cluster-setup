@@ -12,12 +12,12 @@ NAMESPACE="pachyderm"
 
 CLUSTER_NAME="test-cluster"
 
-S3_STORAGE_HOST="<ip-minio>:9001"
+S3_STORAGE_HOST="ip/hostname:9001"
 S3_STORAGE_USERNAME=minio
 S3_STORAGE_PASSWORD=minio123
 S3_STORAGE_BUCKET=audio-mining
 
-PACHCTL_HOST=<hostname-master-node>:30650
+PACHCTL_HOST="ip/hostname:30650"
 # todo filter node out by using node name from: tools/rancher kubectl get pods -o wide -n pachyderm | grep "pachd"
 
 ################################################################
@@ -46,7 +46,6 @@ while true; do
     echo "S3_STORAGE_USERNAME:${bold_font} ${S3_STORAGE_USERNAME} ${normal_font}"
     echo "S3_STORAGE_PASSWORD:${bold_font} ${S3_STORAGE_PASSWORD} ${normal_font}"
     echo "S3_STORAGE_BUCKET:  ${bold_font} ${S3_STORAGE_BUCKET} ${normal_font}"
-    echo "PACHCTL_HOST:       ${bold_font} ${PACHCTL_HOST} ${normal_font}"
     echo "Project Name:       ${bold_font} ${PROJECT_NAME} ${normal_font}"
     echo "Namespace Name:     ${bold_font} ${NAMESPACE} ${normal_font}"
     echo "ETCD_PATH:          ${bold_font} ${ETCD_PATH} ${normal_font}"
