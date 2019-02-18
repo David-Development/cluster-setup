@@ -1,4 +1,7 @@
-in your pipelines, use imagePullSecretes: docker-registry-pachyderm
+# Information
+The following scripts sets up an On-Premises pachyderm cluster using minio as a backend. Make sure to setup minio before (see minio folder for further instructions).
+
+If you have a custom docker-registry, you can specify it in the `startPachyderm.sh` script. In your pipeline-specs you can use the following secret to pull your images: `imagePullSecretes: docker-registry-pachyderm`.
 
 
 # Installation 
