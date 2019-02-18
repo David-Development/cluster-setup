@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  airflow:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile
+    image: airflow:0.1
+    volumes:
+      - "./dags/:/airflow/dags/:rw"
+      - "~/.kube/config:/root/.kube/config:ro"
+    ports:
+      - 8081:8080
+
+  airflow-db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_USER: airflow
+      POSTGRES_DB: airflow
+
+
+# docker exec -it airflow_airflow_1 /bin/bash
+
+
+
+#  airflow-client:
+#    build:
+#      context: ./docker
+#      dockerfile: Dockerfile.client
+#    image: airflow-client:0.1
+#    volumes:
+#      - "./dags/:/dags/:ro"
+#    stdin_open: true
+#    tty: true

@@ -1,0 +1,67 @@
+version: '3'
+
+services:
+
+  digdag:
+    image: digdag:0.0.1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/.docker/config.json:/root/.docker/config.json:ro # mount docker registry login data into the container
+    env_file:
+      - ./docker.env
+    ports:
+      - 65432:65432
+    #  - 65432-65433:65432 # use this for `docker-compose up --scale digdag=2`
+    command: server -c /digdag/config/digdag-server.conf
+    depends_on:
+      - digdag-db
+    deploy:
+      #placement:
+      #  constraints: [node.hostname == my-hostname]
+      # A global service is a service that runs one task on every node.
+      # https://docs.docker.com/engine/swarm/how-swarm-mode-works/services/#replicated-and-global-services
+      mode: global
+      #mode: replicated
+      #replicas: 4 # number of containers that should be running at any given time
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      #resources:
+      #  limits:
+      #    cpus: '0.50'
+      #    memory: 50M
+      #  reservations:
+      #    cpus: '0.25'
+      #    memory: 20M
+
+
+  digdag-db:
+    image: postgres:9-alpine
+    environment:
+      - POSTGRES_USER=digdag
+      - POSTGRES_PASSWORD=mysecretpassword
+      - POSTGRES_DB=digdag
+    command: -c 'max_connections=4096' # https://github.com/treasure-data/digdag/issues/478
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
+        #  - engine.labels.operatingsystem == ubuntu 14.04
+        #preferences:
+        #  - spread: node.labels.zone
+
+#  pg-studio:
+#    image: yorkshirekev/postgres-pgstudio
+#    ports:
+#     - 5432:5432
+#     - 8081:8080
+
+# select count(*) from pg_stat_activity;

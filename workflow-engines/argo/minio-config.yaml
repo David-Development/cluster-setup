@@ -1,0 +1,16 @@
+data:
+  config: |
+    executorImage: argoproj/argoexec:v2.1.1
+    artifactRepository:
+      s3:
+        bucket: audio-mining
+        endpoint: minio-service:9000
+        insecure: true
+        # accessKeySecret and secretKeySecret are secret selectors.
+        # It references the k8s secret named 'argo-artifacts-minio'
+        accessKeySecret:
+          name: argo-artifacts-minio
+          key: accesskey
+        secretKeySecret:
+          name: argo-artifacts-minio
+          key: secretkey
