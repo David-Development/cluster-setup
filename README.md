@@ -84,7 +84,7 @@ git clone https://github.com/David-Development/cluster-setup.git
 - Assume we have three nodes (node1, node2, node3; node1 is master)
 
 ```bash
-cd lm-cluster-setup/swarm
+cd cluster-setup/swarm
 
 # for swarm cluster (multiple nodes)
 bash startSwarmCluster.sh node2 node3
@@ -101,7 +101,7 @@ bash startSwarmCluster.sh
 ## Setup Monitoring
 
 ```bash
-cd lm-cluster-setup/swarm/cluster-monitoring
+cd cluster-setup/swarm/cluster-monitoring
 docker stack deploy --with-registry-auth --compose-file docker-compose.yml cluster-monitor
 ```
 
@@ -119,7 +119,7 @@ docker stack deploy --with-registry-auth --compose-file docker-compose.yml clust
 
 
 ```bash
-cd lm-cluster-setup/swarm/
+cd cluster-setup/swarm/
 bash startDistributedMinioCluster.sh
 ```
 
@@ -138,14 +138,14 @@ bash startDistributedMinioCluster.sh
 - the public key is send to the worker-nodes in order to allow a password-less login
 
 ```bash
-cd lm-cluster-setup/
+cd cluster-setup/
 bash kubernetes/addSshKeys.sh nm-smt02 nm-smt03
 ```
 
 ## Setup Kubernetes/Rancher Cluster
 
 ```bash
-cd lm-cluster-setup/kubernetes
+cd cluster-setup/kubernetes
 export CLUSTER_NAME=<cluster-name>
 bash startCluster.sh ${CLUSTER_NAME}
 bash addNodesToCluster.sh ${CLUSTER_NAME} nm-smt02 nm-smt03
@@ -153,7 +153,7 @@ bash addNodesToCluster.sh ${CLUSTER_NAME} nm-smt02 nm-smt03
 
 - The Rancher UI will be available under: https://nm-smt01:8443 (login admin/admin)
 - The Kubernetes Dashboard will be available under: https://nm-smt01:8444 (login using token - see below)
-- In the directory `lm-cluster-setup/kubernetes` there will be multiple, generated files such as: `kube-dashboard-token.txt`, `kube-dashboard-url.txt` and `rancher-login-token.txt`. 
+- In the directory `cluster-setup/kubernetes` there will be multiple, generated files such as: `kube-dashboard-token.txt`, `kube-dashboard-url.txt` and `rancher-login-token.txt`. 
 - In order to connect your rancher cli from a remote host to your rancher setup, run the following command: `rancher login https://nm-smt01:8443 --token XXX` (use the token from the file `rancher-login-token.txt`)
   - After that you'll be able to run rancher and kubectl commands such as `rancher <command>` and `rancher kubectl <command>`
 
@@ -167,7 +167,7 @@ tools/rancher kubectl create secret docker-registry <registry-name> --docker-ser
 ## Destroy Cluster
 
 ```bash
-cd lm-cluster-setup/kubernetes
+cd cluster-setup/kubernetes
 # bash stopCluster.sh <worker-nodes>
 bash stopCluster.sh nm-smt02 nm-smt03
 ```
