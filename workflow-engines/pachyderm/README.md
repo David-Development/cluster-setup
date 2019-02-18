@@ -14,6 +14,8 @@ If you have a custom docker-registry, you can specify it in the `startPachyderm.
 bash startPachyderm.sh
 ```
 
+- Export environment variable for pachctl: `export PACHD_ADDRESS=hostname:30650`
+
 Docs: https://pachyderm.readthedocs.io/en/stable/deployment/on_premises.html
 
 

@@ -194,6 +194,7 @@ echo "$(date) Cluster is online!"
 
 # copy config to local dir
 echo "Copying kube config to local system (~/.kube/config)"
+mkdir ~/.kube/
 rancher kubectl config view --raw ${CLUSTER_NAME} > ~/.kube/config
 
 : '
