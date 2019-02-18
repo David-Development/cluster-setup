@@ -106,7 +106,7 @@ docker stack deploy --with-registry-auth --compose-file docker-compose.yml clust
 ```
 
 - For more information about the monitoring solution, please take a look into the GitHub Repository ([Link](https://github.com/David-Development/collectd-influxdb-grafana-docker)).
-- Then you can open grafana using http://nm-smt01:3000 (login with admin/admin)
+- Then you can open grafana using http://node1:3000 (login with admin/admin)
 
 
 ## Setup distributed minio storage
@@ -123,14 +123,14 @@ cd cluster-setup/swarm/
 bash startDistributedMinioCluster.sh
 ```
 
-- Access minio using: http://nm-smt01:9001 (login using minio/minio123)
+- Access minio using: http://node1:9001 (login using minio/minio123)
 
 
 
 # Setup Kubernetes
 
 - **IMPORTANT:** Run the following commands **ONLY** on the master node
-- Assume we have three nodes (nm-smt01, nm-smt02, nm-smt03; nm-smt01 is master)
+- Assume we have three nodes (node1, node2, node3; node1 is the master node)
 
 ## Setup SSH on all nodes:
 
@@ -139,7 +139,7 @@ bash startDistributedMinioCluster.sh
 
 ```bash
 cd cluster-setup/
-bash kubernetes/addSshKeys.sh nm-smt02 nm-smt03
+bash kubernetes/addSshKeys.sh node2 node3
 ```
 
 ## Setup Kubernetes/Rancher Cluster
@@ -147,14 +147,18 @@ bash kubernetes/addSshKeys.sh nm-smt02 nm-smt03
 ```bash
 cd cluster-setup/kubernetes
 export CLUSTER_NAME=<cluster-name>
-bash startCluster.sh ${CLUSTER_NAME}
-bash addNodesToCluster.sh ${CLUSTER_NAME} nm-smt02 nm-smt03
+
+# create single node cluster
+bash startCluster.sh ${CLUSTER_NAME} 
+
+# add nodes to cluster it 
+bash addNodesToCluster.sh ${CLUSTER_NAME} node2 node3 
 ```
 
-- The Rancher UI will be available under: https://nm-smt01:8443 (login admin/admin)
-- The Kubernetes Dashboard will be available under: https://nm-smt01:8444 (login using token - see below)
+- The Rancher UI will be available under: https://node1:8443 (login admin/admin)
+- The Kubernetes Dashboard will be available under: https://node1:8444 (login using token - see below)
 - In the directory `cluster-setup/kubernetes` there will be multiple, generated files such as: `kube-dashboard-token.txt`, `kube-dashboard-url.txt` and `rancher-login-token.txt`. 
-- In order to connect your rancher cli from a remote host to your rancher setup, run the following command: `rancher login https://nm-smt01:8443 --token XXX` (use the token from the file `rancher-login-token.txt`)
+- In order to connect your rancher cli from a remote host to your rancher setup, run the following command: `rancher login https://node1:8443 --token XXX` (use the token from the file `rancher-login-token.txt`)
   - After that you'll be able to run rancher and kubectl commands such as `rancher <command>` and `rancher kubectl <command>`
 
 
@@ -169,5 +173,5 @@ tools/rancher kubectl create secret docker-registry <registry-name> --docker-ser
 ```bash
 cd cluster-setup/kubernetes
 # bash stopCluster.sh <worker-nodes>
-bash stopCluster.sh nm-smt02 nm-smt03
+bash stopCluster.sh node2 node3
 ```
