@@ -17,7 +17,7 @@ For the nodes in the cluster to be able to communicate with each other, it is ne
 
 # Required Software:
 
-## Install instructions for Docker on Ubuntu ([Link]((https://docs.docker.com/install/linux/docker-ce/ubuntu/)))
+## Install instructions for Docker on Ubuntu ([Link](https://docs.docker.com/install/linux/docker-ce/ubuntu/))
 
 ```sh
 sudo apt-get update
