@@ -80,15 +80,20 @@ git clone https://github.com/David-Development/cluster-setup.git
 
 # Setup Swarm Cluster
 
-- **IMPORTANT:** Run the following commands **ONLY** on the master node
-- Assume we have three nodes (nm-smt01, nm-smt02, nm-smt03; nm-smt01 is master)
+- IMPORTANT: Run the following commands *ONLY* on the master node
+- Assume we have three nodes (node1, node2, node3; node1 is master)
 
 ```bash
 cd lm-cluster-setup/swarm
-bash startSwarmCluster.sh nm-smt02 nm-smt03
+
+# for swarm cluster (multiple nodes)
+bash startSwarmCluster.sh node2 node3
+
+# for standalone (single node swarm)
+bash startSwarmCluster.sh
 ```
 
-- After that you'll be able to access Portainer using: http://nm-smt01:9000 (login using admin/admin)
+- After that you'll be able to access Portainer using: http://node1:9000 (login using admin/admin)
 
 
 # Setup Monitoring and Minio Storage
