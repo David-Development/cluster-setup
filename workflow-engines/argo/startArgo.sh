@@ -16,14 +16,14 @@ CLUSTER_NAME="test-cluster"
 ARGO_CLI_VERSION="v2.2.1"
 ARGO_WEB_VERSION="v2.2.1"
 RANCHER_CLI_VERSION=v2.0.4
-RANCHER_VERSION=v2.0.8
+
+# s3 bucket is specified in minio-config.yaml as well
+S3_STORAGE_BUCKET="argo"
 
 ######################################
 
-
-
-
-MINIO_ADDRESS="minio-service:9000" # kubernetes cluster
+# minio will be hosted in kubernetes cluster
+MINIO_ADDRESS="minio-service:9000" 
 
 # export path variable to include "tools" (kubectl / rancher / ...)
 TOOLS_FOLDER="$(pwd)/tools/"
@@ -31,6 +31,28 @@ PATH="$PATH:${TOOLS_FOLDER}"
 mkdir -p "${TOOLS_FOLDER}"
 
 KC=~/.rancher/kubeconfig
+
+bold_font=$(tput bold)
+normal_font=$(tput sgr0)
+
+
+while true; do
+    echo "${bold_font}Configuration:${normal_font}"
+    echo "PROJECT_NAME:        ${bold_font} ${PROJECT_NAME} ${normal_font}"
+    echo "NAMESPACE:           ${bold_font} ${NAMESPACE} ${normal_font}"
+    echo "ARGO_CLI_VERSION:    ${bold_font} ${ARGO_CLI_VERSION} ${normal_font}"
+    echo "ARGO_WEB_VERSION:    ${bold_font} ${ARGO_WEB_VERSION} ${normal_font}"
+    echo "RANCHER_CLI_VERSION: ${bold_font} ${RANCHER_CLI_VERSION} ${normal_font}"
+    echo "Tools Folder:        ${bold_font} ${TOOLS_FOLDER} ${normal_font}"
+    echo " "
+    read -p "Is this configuration correct? (y/n): " yn
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+
 
 
 # Download Rancher if necessary
@@ -88,7 +110,7 @@ echo ""
 #read ARGO_PROJ_ID
 ARGO_PROJ_ID=$(rancher projects | grep "${PROJECT_NAME}" | awk '{print $1;}')
 echo "Associate argo namespace to project.. (${ARGO_PROJ_ID})"
-rancher namespace associate "${NAMESPACE}" "${ARGO_PROJ_ID}"
+rancher namespace move "${NAMESPACE}" "${ARGO_PROJ_ID}";
 
 echo "Done!"
 echo "waiting for cluster .. hang in there.. "
@@ -125,16 +147,19 @@ rancher kubectl create -f minio-standalone-service.yaml
 
 echo "wait.."
 
+rancher kubectl wait --timeout=60s --for=condition=available deployment/minio-deployment -n default
 sleep 5
 
 MINIO_NODE=$(rancher kubectl get pods --selector=app=minio -o jsonpath='{.items[*].spec.nodeName}')
-MINIO_NODE=($MINIO_NODE)
-MINIO_NODE=${MINIO_NODE[0]}
-MINIO_NODE_URL="http://${MINIO_NODE}:9001"
+#MINIO_NODE=($MINIO_NODE)
+#MINIO_NODE=${MINIO_NODE[0]}
+#MINIO_NODE_URL="http://${MINIO_NODE}:9001"
+MINIO_NODE_IP=$(rancher kubectl get node "${MINIO_NODE}" -o jsonpath='{ .status.addresses[?(@.type=="InternalIP")].address }')
+MINIO_NODE_URL="http://${MINIO_NODE_IP}:9001"
 echo "${MINIO_NODE_URL}"
 xdg-open "${MINIO_NODE_URL}"
 
-
+docker run --entrypoint "sh" minio/mc -c "mc config host add minio ${MINIO_NODE_URL} \"minio\" \"minio123\"; mc config host ls; mc mb minio/${S3_STORAGE_BUCKET}"
 
 
 ###############################################################################
@@ -168,23 +193,19 @@ echo ""
 #rancher kubectl -n argo port-forward deployment/argo-ui 8001:8001
 
 rancher kubectl patch deployment argo-ui -n argo --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/ports", "value": [{"hostPort": 8001, "containerPort": 8001}]}]'
-
 rancher kubectl get deployment argo-ui -n argo -o wide
 
 echo "wait..."
-sleep 3
+sleep 3;
 
-#rancher kubectl get pods -n argo --selector=app=argo-ui -o wide
+rancher kubectl wait --timeout=60s --for=condition=available deployment/argo-ui -n ${NAMESPACE}
 ARGO_UI_NODE=$(rancher kubectl get pods -n argo --selector=app=argo-ui -o jsonpath='{.items[*].spec.nodeName}')
 ARGO_UI_NODE=($ARGO_UI_NODE)
 ARGO_UI_NODE=${ARGO_UI_NODE[0]}
-ARGO_UI_URL="http://${ARGO_UI_NODE}:8001/workflows"
+ARGO_UI_NODE_IP=$(rancher kubectl get node "${ARGO_UI_NODE}" -o jsonpath='{ .status.addresses[?(@.type=="InternalIP")].address }')
+ARGO_UI_URL="http://${ARGO_UI_NODE_IP}:8001/workflows"
 
 echo "${ARGO_UI_URL}"
-
-echo "wait..."
-sleep 10
-
 xdg-open "${ARGO_UI_URL}"
 
 # Kill port-forwards after this script exists!

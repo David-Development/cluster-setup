@@ -21,10 +21,11 @@ rancher kubectl delete deployment minio-deployment
 rancher kubectl delete pvc minio-pv-claim
 rancher kubectl delete pv minio-pv
 
-rancher kubectl delete pv minio-persistent-volume
-
-rancher kubectl delete ingress minio-service-ingress
+#rancher kubectl delete pv minio-persistent-volume
+#rancher kubectl delete ingress minio-service-ingress
 
 
 # Delete Service Account for Argo
 rancher kubectl delete rolebinding default-admin
+
+rancher namespaces delete ${NAMESPACE}

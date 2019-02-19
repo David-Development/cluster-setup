@@ -3,7 +3,7 @@ data:
     executorImage: argoproj/argoexec:v2.1.1
     artifactRepository:
       s3:
-        bucket: audio-mining
+        bucket: argo
         endpoint: minio-service:9000
         insecure: true
         # accessKeySecret and secretKeySecret are secret selectors.
