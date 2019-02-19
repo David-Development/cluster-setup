@@ -21,5 +21,6 @@ timezone: Europe/Berlin
   +baz:
     sh>: "echo bar and baz run in parallel"
 
-+abc:
-sh>: "echo please check other examples in examples/ directory for more features."
+  +abc:
+    sh>: "echo please check other examples in examples/ directory for more features."
+
