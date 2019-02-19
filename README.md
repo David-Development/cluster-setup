@@ -4,7 +4,7 @@ These instructions describe how to set up an On-Premises cluster using Docker Sw
 
 For monitoring purposes Docker-Swarm is used (Grafana / Telegraf).
 
-As many workflow-engines support S3 Storages, Minio will be used in most cases as a storage.
+As many workflow-engines support S3 Storages, Minio will be used in most cases as a storage backend.
 
 
 # Prerequisites:
