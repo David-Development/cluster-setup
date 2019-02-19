@@ -12,12 +12,12 @@ NAMESPACE="pachyderm"
 
 CLUSTER_NAME="test-cluster"
 
-S3_STORAGE_HOST="ip/hostname:9001"
+S3_STORAGE_HOST="192.168.166.130:9001"
 S3_STORAGE_USERNAME=minio
 S3_STORAGE_PASSWORD=minio123
 S3_STORAGE_BUCKET=audio-mining
 
-PACHCTL_HOST="ip/hostname:30650"
+PACHCTL_HOST="192.168.166.130:30650"
 # todo filter node out by using node name from: tools/rancher kubectl get pods -o wide -n pachyderm | grep "pachd"
 
 ################################################################
@@ -114,7 +114,7 @@ echo "Deleting project.."
 rancher projects rm pachyderm
 
 echo "Deleting leftovers in s3 storage.."
-docker run minio/mc bash -c "mc config host add minio http://${S3_STORAGE_HOST} \"minio\" \"minio123\"; mc config host ls; mc rm --recursive --force minio/${S3_STORAGE_BUCKET}/pach/"
+docker run --entrypoint "sh" minio/mc -c "mc config host add minio http://${S3_STORAGE_HOST} \"${S3_STORAGE_USERNAME}\" \"${S3_STORAGE_PASSWORD}\"; mc config host ls; mc rm --recursive --force minio/${S3_STORAGE_BUCKET}/pach/"
 
 
 # TODO ADJUST !!!!!!
