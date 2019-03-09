@@ -8,6 +8,10 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage
-  local:
-    path: ~/persistent-storage/pachyderm-minio-storage/
+  storageClassName: manual
+  hostPath:
+    path: /persistent-storage/pachyderm-minio-storage/
+  #storageClassName: local-storage  
+  #local:
+  #  path: /persistent-storage/pachyderm-minio-storage/
+  

@@ -13,12 +13,14 @@ fi
 
 HOST_IP=$(hostname -I | awk '{print $1}')
 
+
 S3_STORAGE_HOST="minio-service:9000"
 S3_STORAGE_USERNAME=minio
 S3_STORAGE_PASSWORD=minio123
 S3_STORAGE_BUCKET=pachyderm
 
-ETCD_STORAGE="~/persistent-storage/pachyderm-etcd"
+ETCD_STORAGE="/persistent-storage/pachyderm-etcd"
+#ETCD_STORAGE="$HOME/persistent-storage/pachyderm-etcd"
 NUM_ETCD_NODES=1
 
 PROJECT_NAME="pachyderm"
@@ -57,6 +59,7 @@ normal_font=$(tput sgr0)
 
 while true; do
     echo "${bold_font}Configuration:${normal_font}"
+    echo "HOST_IP:                 ${bold_font} ${HOST_IP} ${normal_font}"
     echo "CLUSTER_NAME:            ${bold_font} ${CLUSTER_NAME} ${normal_font}"
     echo "ETCD_STORAGE:            ${bold_font} ${ETCD_STORAGE} ${normal_font}"
     echo "NUM_ETCD_NODES:          ${bold_font} ${NUM_ETCD_NODES} ${normal_font}"
@@ -105,6 +108,15 @@ if [ ! -f "${TOOLS_FOLDER}pachctl" ]; then
 fi
 
 
+# Download mc if necessary (minio)
+if [ ! -f "${TOOLS_FOLDER}mc" ]; then
+    echo "mc not found.. downloading.."
+    curl -o ${TOOLS_FOLDER}mc https://dl.minio.io/client/mc/release/linux-amd64/mc
+    chmod +x ${TOOLS_FOLDER}mc
+    echo ""
+fi
+
+
 
 ###############################################################################
 # Deployment of K3s
@@ -119,7 +131,7 @@ docker-compose down -v --remove-orphans
 cd $CURRENT_DIR
 
 echo "Publish port"
-sed -i "s#ports:#ports:\n    - \"30080:30080\"\n    - \"30650:30650\"\n    - \"30651:30651\"\n    - \"30652:30652\"\n    - \"30654:30654\"\n    - \"30999:30999\"#" k3s/docker-compose.yml
+sed -i "s#privileged: true#privileged: true\n    ports:\n    - \"9001:9001\"\n    - \"30080:30080\"\n    - \"30650:30650\"\n    - \"30651:30651\"\n    - \"30652:30652\"\n    - \"30654:30654\"\n    - \"30999:30999\"#" k3s/docker-compose.yml
 cd k3s
 docker-compose up -d --scale node=1
 cd $CURRENT_DIR
@@ -143,7 +155,7 @@ do
   echo "Waiting for cluster to come online"
   sleep 1
 done
-sleep 20
+sleep 5
 kubectl --kubeconfig=$KC cluster-info
 
 
@@ -198,9 +210,15 @@ fi
 echo "Deploying Minio"
 kubectl --kubeconfig=$KC create -n pachyderm -f minio-pv.yaml
 kubectl --kubeconfig=$KC create -n pachyderm -f minio-deployment.yaml
-kubectl --kubeconfig=$KC wait --timeout=400s --for condition=ready -n pachyderm pod -l=app=minio
+kubectl --kubeconfig=$KC wait --timeout=500s --for condition=ready -n pachyderm pod -l=app=minio
 
+sleep 10
 
+mc config host add minio http://${HOST_IP}:9001 minio minio123
+echo "Creating bucket pachyderm in minio storage"
+mc mb pachyderm
+
+#exit 0
 
 echo "Deploying Pachyderm connection"
 # pachctl deploy custom --persistent-disk google --object-store s3 <persistent disk name> <persistent disk size> <object store bucket> <object store id> <object store secret> <object store endpoint> --static-etcd-volume=${STORAGE_NAME} --dry-run > deployment.json
@@ -228,11 +246,13 @@ kubectl --kubeconfig=$KC wait --timeout=400s --for condition=ready -n pachyderm 
 
 # todo automate this!!!
 export PACHD_ADDRESS=${PACHD_HOST}:30650
+echo "export PACHD_ADDRESS=${PACHD_HOST}:30650"
 pachctl version
+pachctl list-job
 
-tools/kubectl --kubeconfig=./k3s/kubeconfig.yaml get services -n pachyderm
-tools/kubectl --kubeconfig=./k3s/kubeconfig.yaml get pods -n pachyderm
+#tools/kubectl --kubeconfig=./k3s/kubeconfig.yaml get services -n pachyderm
+#tools/kubectl --kubeconfig=./k3s/kubeconfig.yaml get pods -n pachyderm
 
 #tools/kubectl --kubeconfig=./k3s/kubeconfig.yaml logs -n pachyderm 
 
-tools/kubectl --kubeconfig=./k3s/kubeconfig.yaml describe pods -n pachyderm
+#tools/kubectl --kubeconfig=./k3s/kubeconfig.yaml describe pods -n pachyderm

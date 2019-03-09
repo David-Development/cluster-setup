@@ -14,7 +14,7 @@ spec:
     requests:
       storage: 10Gi
   # Uncomment and add storageClass specific to your requirements below. Read more https://kubernetes.io/docs/concepts/storage/persistent-volumes/#class-1
-  #storageClassName:
+  storageClassName: manual
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -51,6 +51,7 @@ spec:
           value: "minio123"
         ports:
         - containerPort: 9000
+          hostPort: 9001
         # Mount the volume into the pod
         volumeMounts:
         - name: storage # must match the volume name, above
@@ -68,3 +69,4 @@ spec:
       protocol: TCP
   selector:
     app: minio
+
