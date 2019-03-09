@@ -10,4 +10,4 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: local-storage
   local:
-    path: ~/pachyderm-minio-storage/
+    path: ~/persistent-storage/pachyderm-minio-storage/

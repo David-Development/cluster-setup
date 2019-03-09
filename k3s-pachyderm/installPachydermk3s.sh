@@ -18,13 +18,13 @@ S3_STORAGE_USERNAME=minio
 S3_STORAGE_PASSWORD=minio123
 S3_STORAGE_BUCKET=pachyderm
 
-ETCD_STORAGE="/home/david/persistent-storage/pachyderm-etcd"
+ETCD_STORAGE="~/persistent-storage/pachyderm-etcd"
 NUM_ETCD_NODES=1
 
 PROJECT_NAME="pachyderm"
 NAMESPACE="pachyderm"
 
-CLUSTER_NAME="test-cluster"
+CLUSTER_NAME="pachyderm"
 
 # enable custom registry
 DOCKER_REGISTRY_ENABLED=false
@@ -57,6 +57,7 @@ normal_font=$(tput sgr0)
 
 while true; do
     echo "${bold_font}Configuration:${normal_font}"
+    echo "CLUSTER_NAME:            ${bold_font} ${CLUSTER_NAME} ${normal_font}"
     echo "ETCD_STORAGE:            ${bold_font} ${ETCD_STORAGE} ${normal_font}"
     echo "NUM_ETCD_NODES:          ${bold_font} ${NUM_ETCD_NODES} ${normal_font}"
     echo "S3_STORAGE_HOST:         ${bold_font} ${S3_STORAGE_HOST} ${normal_font}"
@@ -74,6 +75,7 @@ while true; do
     echo "PACH_BLOCK_CACHE_SIZE:   ${bold_font} ${PACH_BLOCK_CACHE_SIZE} ${normal_font}"
     echo "KUBE_CONFIG:             ${bold_font} ${KC} ${normal_font}"
     echo "PACHD_HOST:              ${bold_font} ${PACHD_HOST} ${normal_font}"
+    echo "PACHCTL_VERSION:         ${bold_font} ${PACHCTL_VERSION} ${normal_font}"
     echo "Tools Folder:            ${bold_font} ${TOOLS_FOLDER} ${normal_font}"
     echo " "
     read -p "Is this configuration correct? (y/n): " yn
@@ -234,7 +236,3 @@ tools/kubectl --kubeconfig=./k3s/kubeconfig.yaml get pods -n pachyderm
 #tools/kubectl --kubeconfig=./k3s/kubeconfig.yaml logs -n pachyderm 
 
 tools/kubectl --kubeconfig=./k3s/kubeconfig.yaml describe pods -n pachyderm
-
-: '
-docker run -v /home/dluhmer/development/persistent-storage:/home/dluhmer/development/persistent-storage ubuntu:16.04 /bin/bash -c "rm -rf /home/dluhmer/development/persistent-storage"
-'
