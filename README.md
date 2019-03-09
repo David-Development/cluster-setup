@@ -1,14 +1,16 @@
 # On-Premises Docker Swarm and Kubernetes Setup
 
-These instructions describe how to set up an On-Premises cluster using Docker Swarm and Kubernetes. You can specify on the fly how many worker you have/need.
+These instructions describe how to set up an On-Premises cluster using Docker Swarm and Kubernetes. You can specify on the fly how many workers you want to create.
 
-For monitoring and storage purposes we use Docker-Swarm (Grafana and Minio S3).
+For monitoring purposes Docker-Swarm is used (Grafana / Telegraf).
+
+As many workflow-engines support S3 Storages, Minio will be used in most cases as a storage backend.
 
 
 # Prerequisites:
 
 ## Operating System
-Ubuntu / CentOS / .. (anything that supports Docker)
+Ubuntu / CentOS / anything that supports Docker
 
 
 ## Static IP address
