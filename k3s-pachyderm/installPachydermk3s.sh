@@ -8,25 +8,11 @@ if test "$BASH" != "/bin/bash"; then
 fi
 
 
-
+################################################################
+# USER-CHANGES
 ################################################################
 
 HOST_IP=$(hostname -I | awk '{print $1}')
-
-
-S3_STORAGE_HOST="minio-service:9000"
-S3_STORAGE_USERNAME=minio
-S3_STORAGE_PASSWORD=minio123
-S3_STORAGE_BUCKET=pachyderm
-
-ETCD_STORAGE="/persistent-storage/pachyderm-etcd"
-#ETCD_STORAGE="$HOME/persistent-storage/pachyderm-etcd"
-NUM_ETCD_NODES=1
-
-PROJECT_NAME="pachyderm"
-NAMESPACE="pachyderm"
-
-CLUSTER_NAME="pachyderm"
 
 # enable custom registry
 DOCKER_REGISTRY_ENABLED=false
@@ -35,14 +21,35 @@ DOCKER_REGISTRY_USERNAME="username"
 DOCKER_REGISTRY_PASSWORD="password"
 DOCKER_REGISTRY_EMAIL="email"
 
+
+# ETCD path - can be anything (this won't affect your host system as this directory will be created in the k3s node docker container)
+ETCD_STORAGE="/persistent-storage/pachyderm-etcd"
+#ETCD_STORAGE="$HOME/persistent-storage/pachyderm-etcd"
+NUM_ETCD_NODES=1
+
+
+# minio storage will be available inside k3s as minio-service
+S3_STORAGE_HOST="minio-service:9000"
+S3_STORAGE_USERNAME=minio
+S3_STORAGE_PASSWORD=minio123
+S3_STORAGE_BUCKET=pachyderm
+
+PROJECT_NAME="pachyderm"
+NAMESPACE="pachyderm"
+
+CLUSTER_NAME="pachyderm"
+
 # Size of pachd's in-memory cache for PFS files. Size is specified in bytes, with allowed SI suffixes (M, K, G, Mi, Ki, Gi, etc).
 PACH_BLOCK_CACHE_SIZE=1G 
+# hostname of the pachd host (since our host is named "node" in docker-compose, we can just use it)
 PACHD_HOST="node"
-
 
 PACHCTL_VERSION=1.8.5
 
 ################################################################
+# DO NOT MODIFY ANYTHING BELOW
+################################################################
+
 
 # export path variable to include "tools" (kubectl / rancher / ...)
 TOOLS_FOLDER="$(pwd)/tools/"
@@ -245,8 +252,8 @@ kubectl --kubeconfig=$KC wait --timeout=400s --for condition=ready -n pachyderm 
 kubectl --kubeconfig=$KC wait --timeout=400s --for condition=ready -n pachyderm pod -l=app=etcd
 
 # todo automate this!!!
-export PACHD_ADDRESS=${PACHD_HOST}:30650
-echo "export PACHD_ADDRESS=${PACHD_HOST}:30650"
+export PACHD_ADDRESS=${HOST_IP}:30650
+echo "export PACHD_ADDRESS=${HOST_IP}:30650"
 pachctl version
 pachctl list-job
 
