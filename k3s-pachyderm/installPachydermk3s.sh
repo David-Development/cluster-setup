@@ -223,7 +223,7 @@ sleep 10
 
 mc config host add minio http://${HOST_IP}:9001 minio minio123
 echo "Creating bucket pachyderm in minio storage"
-mc mb pachyderm
+mc mb minio/pachyderm
 
 #exit 0
 
