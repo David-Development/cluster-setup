@@ -29,3 +29,15 @@ docker-compose down -v --remove-orphans
 ```
 
 
+# Access minio from host
+
+```bash
+tools/mc config host add minio http://localhost:9001 minio minio123
+tools/mc ls minio
+```
+
+# Access kubernetes from host
+
+```bash
+tools/kubectl --kubeconfig=./k3s/kubeconfig.yaml get pods -n pachyderm
+```
