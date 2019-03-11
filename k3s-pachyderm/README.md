@@ -1,4 +1,4 @@
-# Deploying k3s along with Pachyderm
+# Deploying k3s alongside Pachyderm
 
 The scripts in this folder will download and run a [k3s](https://github.com/rancher/k3s) kubernetes cluster using `docker-compose` and deploy pachyderm inside that cluster. As a backend storage minio will be used (also inside k3s). You only need to have `docker` and `docker-compose` installed. Everything else will happen inside the docker container. No data will be stored on your local system. If you tear down the container, everything will be deleted. If you messed something up, just run the install script again. It'll delete everything before restarting (be careful if you have important data inside the pachyderm cluster).
 
