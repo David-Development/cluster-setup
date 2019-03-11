@@ -6,6 +6,8 @@ The scripts in this folder will download and run a [k3s](https://github.com/ranc
 In order to start k3s and pachyderm run the following command
 
 ```bash 
+git clone https://github.com/David-Development/cluster-setup.git
+cd cluster-setup/k3s-pachyderm
 . installPachydermk3s.sh # (use . in order to export the PACHD_ADDRESS automatically)
 ```
 
