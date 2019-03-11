@@ -166,27 +166,25 @@ sleep 5
 kubectl --kubeconfig=$KC cluster-info
 
 
-echo "#####################################"
-echo "Cleanup - Manually deleting resources"
-kubectl --kubeconfig=$KC delete service -l suite=pachyderm --namespace pachyderm
-kubectl --kubeconfig=$KC delete deployments -l suite=pachyderm --namespace pachyderm
-kubectl --kubeconfig=$KC delete StatefulSet -l suite=pachyderm --namespace pachyderm
+#echo "#####################################"
+#echo "Cleanup - Manually deleting pachyderm resources"
+#kubectl --kubeconfig=$KC delete service -l suite=pachyderm --namespace pachyderm
+#kubectl --kubeconfig=$KC delete deployments -l suite=pachyderm --namespace pachyderm
+#kubectl --kubeconfig=$KC delete StatefulSet -l suite=pachyderm --namespace pachyderm
+#
+#kubectl --kubeconfig=$KC delete pvc -l suite=pachyderm --namespace pachyderm
+#PVs=($(kubectl --kubeconfig=$KC get pv | grep "pachyderm-etcd-pv" | cut -d " " -f 1))
+#for PV in "${PVs[@]}"; do
+#    kubectl --kubeconfig=$KC delete pv $PV
+#done
 
-kubectl --kubeconfig=$KC delete pvc -l suite=pachyderm --namespace pachyderm
-PVs=($(kubectl --kubeconfig=$KC get pv | grep "pachyderm-etcd-pv" | cut -d " " -f 1))
-for PV in "${PVs[@]}"; do
-    kubectl --kubeconfig=$KC delete pv $PV
-done
+#kubectl --kubeconfig=$KC delete storageclass --namespace pachyderm etcd-storage-class
+#kubectl --kubeconfig=$KC delete clusterrolebinding --namespace pachyderm pachyderm
+#kubectl --kubeconfig=$KC delete clusterroles --namespace pachyderm pachyderm
 
+#kubectl --kubeconfig=$KC delete replicationcontroller -l suite=pachyderm --namespace pachyderm
 
-kubectl --kubeconfig=$KC delete storageclass --namespace pachyderm etcd-storage-class
-kubectl --kubeconfig=$KC delete clusterrolebinding --namespace pachyderm pachyderm
-kubectl --kubeconfig=$KC delete clusterroles --namespace pachyderm pachyderm
-
-kubectl --kubeconfig=$KC delete replicationcontroller -l suite=pachyderm --namespace pachyderm
-
-kubectl --kubeconfig=$KC delete namespace ${NAMESPACE}
-
+#kubectl --kubeconfig=$KC delete namespace ${NAMESPACE}
 
 
 
