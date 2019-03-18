@@ -37,7 +37,7 @@ PACHD_HOST="ip/hostname"
 
 RANCHER_CLI_VERSION=v2.0.6
 
-PACHCTL_VERSION=1.8.4
+PACHCTL_VERSION=1.8.6
 
 ################################################################
 
@@ -97,6 +97,17 @@ if [ ! -f "${TOOLS_FOLDER}kubectl" ]; then
     curl -L -o "${TOOLS_FOLDER}kubectl" https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
     chmod +x ${TOOLS_FOLDER}kubectl
     echo ""
+fi
+
+
+# check version of pachctl
+if [ -f "${TOOLS_FOLDER}pachctl" ]; then
+    PACHCTL_CUR_VERSION=$(${TOOLS_FOLDER}pachctl version --client-only)
+    echo "Currently installed pachchtl version: $PACHCTL_CUR_VERSION"
+    if [ "$PACHCTL_CUR_VERSION" != "$PACHCTL_VERSION" ]; then
+        echo "Versions do not match.. deleting existing pachctl.."
+        rm ${TOOLS_FOLDER}pachctl
+    fi
 fi
 
 # Download pachctl if necessary
